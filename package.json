@@ -1,0 +1,37 @@
+{
+  "name": "moneykeeper-api",
+  "version": "1.0.0",
+  "description": "Backend for MoneyKeeper Web Application",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/Server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sorbrex/MoneyKeeper-API.git"
+  },
+  "keywords": [
+    "prisma",
+    "mongodb",
+    "fastify",
+    "moneykeeper",
+    "api"
+  ],
+  "author": "Sorbrex",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sorbrex/MoneyKeeper-API/issues"
+  },
+  "homepage": "https://github.com/sorbrex/MoneyKeeper-API#readme",
+  "dependencies": {
+    "@prisma/client": "^4.6.1",
+    "fastify": "^4.10.2",
+    "fastify-plugin": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "prisma": "^4.6.1",
+    "typescript": "^4.9.3"
+  }
+}
