@@ -14,8 +14,7 @@ export const ISignUpSchema = {
       200: {
         type: 'object',
         properties: {
-          id: { type: 'string' },
-          jwtToken: { type: 'string' }
+          message: { type: 'string' }
         },
       },
       500: {
@@ -29,3 +28,27 @@ export const ISignUpSchema = {
 
   }
 }
+
+export const IConfirmSchema = {
+  schema: {
+    params: {
+      token: { type: 'string' }
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        },
+      },
+      500: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          error: { type: 'string' }
+        }
+      }
+    },
+  }
+}
+

@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify"
 
-export async function UserRoutes(app: FastifyInstance) {
+export async function AppRoutes(app: FastifyInstance) {
 
   app.addHook('onRequest', async () => {
     //TODO: Add JWT Authentication
