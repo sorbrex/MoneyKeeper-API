@@ -6,8 +6,10 @@ import prismaPlugin from './Plugins/Prisma'
 import Mailer from './Plugins/Mailer'
 import cors from '@fastify/cors'
 import { env } from 'process'
+import { PrivateRoutes } from './Routes/PrivateRoutes'
 
 const app: FastifyInstance = fastify({ logger: false })
+
 app.register(cors, {
   hook: 'preHandler',
 })
@@ -15,6 +17,7 @@ app.register(cors, {
 app.get('/', async () => {
   return "Money Keeper API\n\t/ - Home\n\t\t/user - User Routes\n\t\t\t/user/ping - Ping Route\n\t\t\t/user/signup - Signup Route"
 })
+
 
 //Plugins Register
 app.register(prismaPlugin)
@@ -24,6 +27,7 @@ app.register(Mailer)
 app.register(UserRoutes, { prefix: '/user' })
 app.register(AppRoutes, { prefix: '/app' })
 app.register(ContactRoutes, { prefix: '/contact' })
+app.register(PrivateRoutes, { prefix: '/private' })
 
 app.listen({ port: parseInt(env.SERVER_PORT || "3000") }, err => {
   if (err) {

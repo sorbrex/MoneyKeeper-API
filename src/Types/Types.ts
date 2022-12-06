@@ -8,3 +8,9 @@ export type TSignUpRequest = {
 }
 
 export type TemplateRequest = "reset" | "confirm"
+
+export type TChallengeKeyDictionary = {
+  id: string,
+  challenge: string,
+  passphrase: string
+}

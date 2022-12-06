@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "npx ts-node src/Server.ts",
-    "generate" : "npx prisma generate"
+    "generate": "npx prisma generate"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/sorbrex/MoneyKeeper-API#readme",
   "dependencies": {
     "@prisma/client": "^4.6.1",
+    "crypto-js": "^4.1.1",
     "fastify": "^4.10.2",
     "fastify-plugin": "^4.3.0",
     "jsonwebtoken": "^8.5.1",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@fastify/cors": "^8.2.0",
+    "@types/crypto-js": "^4.1.1",
     "@types/jsonwebtoken": "^8.5.9",
     "@types/node": "^18.11.9",
     "@types/nodemailer": "^6.4.6",
