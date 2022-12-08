@@ -31,8 +31,12 @@ export const ISignUpSchema = {
 
 export const IConfirmSchema = {
   schema: {
-    params: {
-      token: { type: 'string' }
+    querystring: {
+      required: ['jwt'],
+      type: 'object',
+      properties: {
+        jwt: { type: 'string' },
+      }
     },
     response: {
       200: {

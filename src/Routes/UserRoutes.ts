@@ -1,7 +1,7 @@
 import { IConfirmSchema, ISignUpSchema } from "../Interfaces/Interfaces"
 import getTemplate from "../Utils/MailTemplates"
 import { FastifyInstance } from "fastify"
-import JWT from 'jsonwebtoken'
+import JsonWebToken from 'jsonwebtoken'
 
 export async function UserRoutes(app: FastifyInstance) {
   //Ping Route For Testing
@@ -13,11 +13,10 @@ export async function UserRoutes(app: FastifyInstance) {
   app.post('/signup', ISignUpSchema, async (request: any, reply: any) => {
     const userData = request.body
     const DB = app.prisma
-
     try {
 
       //Check If User With Same Email Exists
-      const result = await DB.user.findUnique({
+      const result = await DB.users.findUnique({
         where: {
           email: userData.email
         }
@@ -28,7 +27,7 @@ export async function UserRoutes(app: FastifyInstance) {
       }
 
       //User Doesn't Exist, Create New User
-      let userCreated = await DB.user.create({
+      let userCreated = await DB.users.create({
         data: {
           name: userData.name,
           surname: userData.surname,
@@ -38,8 +37,8 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //User Created, Generate JWT Token for Confirmation Email
-      let token = JWT.sign(userData, process.env.SECRET || '');
-      await DB.jWT.create({
+      let token = JsonWebToken.sign(userData, process.env.JWT_SECRET_KEY || '');
+      await DB.tokens.create({
         data: {
           token: token,
           userId: userCreated.id,
@@ -47,20 +46,20 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //JWT Token Created, generate Confirmation URL
-      const confirmationURL = `${process.env.BASE_URL}/user/confirm/${token}`
+      const confirmationURL = `${process.env.BASE_URL}/user/confirm?jwt=${token}`
+
 
       //Send Confirmation Email
       await app.transporter.sendMail({
         from: {
           name: 'Money Keeper',
-          address: process.env.USERNAME || '',
+          address: process.env.NODEMAILER_USERNAME || '',
         },
         to: userCreated.email,
         subject: 'Money Keeper Registration',
         html: getTemplate('confirm', confirmationURL),
       })
 
-      console.log('[User Creation] Email Sent')
       return reply.code(200).send({ message: 'User Created. Email Sent.' })
 
     } catch (err) {
@@ -70,31 +69,32 @@ export async function UserRoutes(app: FastifyInstance) {
   })
 
   // 2 - Confirm Route
-  app.patch('/confirm/:token', IConfirmSchema, async (request: any, reply: any) => {
+  app.get('/confirm', IConfirmSchema, async (request: any, reply: any) => {
     try {
       const DB = app.prisma
-      const token = request.params.token
+      const token = request.query.jwt
 
       //Check If Token Exists
-      const result = await DB.jWT.findUnique({
+      const result = await DB.tokens.findUnique({
         where: {
           token: token
         }
       })
+
 
       if (!result) {
         return reply.code(404).send({ message: 'Token Not Found' })
       }
 
       //Token Exists, Check If Token Is Valid
-      let decoded = JWT.verify(token, process.env.SECRET || '')
+      let decoded = JsonWebToken.verify(token, process.env.JWT_SECRET_KEY || '')
 
       if (!decoded) {
         return reply.code(401).send({ message: 'Token Invalid' })
       }
 
       //Token Is Valid, Update User
-      await DB.user.update({
+      await DB.users.update({
         where: {
           id: result.userId
         },
@@ -104,7 +104,7 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //User Updated, Delete Token
-      await DB.jWT.delete({
+      await DB.tokens.delete({
         where: {
           token: token
         }
@@ -119,7 +119,7 @@ export async function UserRoutes(app: FastifyInstance) {
 
   // 3 - Login Route
   app.post('/login', async (request: any, reply: any) => {
-    const result = await app.prisma.user.findUnique({
+    const result = await app.prisma.users.findUnique({
       where: {
         email: request.body.email
       }

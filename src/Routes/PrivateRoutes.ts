@@ -34,6 +34,24 @@ export async function PrivateRoutes(app: FastifyInstance) {
     return { encryptedAppId: encryptedAppId.toString(), challengeKey: challengeKey }
   })
 
+  app.get('/google_client_id', async (req: any, res: any) => {
+    const requestId = req.query.requestId
+    assert(requestId, "Request Id Not Found")
+
+    const challengeKey = Math.random().toString(36).substring(7)
+    const cryptPassphrase = Math.random().toString(36).substring(7)
+    const encryptedAppId = CryptoJS.AES.encrypt(env.GOOGLE_CLIENT_ID || "", cryptPassphrase)
+
+    appIdChallengeKeyDictionary.push({
+      id: requestId,
+      challenge: challengeKey,
+      passphrase: cryptPassphrase
+    })
+
+
+    return { encryptedAppId: encryptedAppId.toString(), challengeKey: challengeKey }
+  })
+
   app.get('/challenge_passphrase', async (req: any, res: any) => {
     const requestId = req.query.requestId
     const challengeKey = req.query.challenge
