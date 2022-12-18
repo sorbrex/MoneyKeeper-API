@@ -177,7 +177,7 @@ export default function getTemplate(request: TemplateRequest, url: string) {
               style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
               <p style="margin: 0;"> If that doesn't work, copy and paste the following
                 link in your browser:</p>
-              <p style="margin: 0; max-width: 500px;"> <a href=${url} target="_blank"> ${url} </a></p>
+              <p p style="margin: 0;"> <a href=${url} target="_blank"> ${url} </a></p>
             </td>
           </tr>
           <!--Link -->
