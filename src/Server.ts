@@ -15,7 +15,7 @@ app.register(cors, {
 })
 
 app.get('/', () => {
-  return "Money Keeper API\n\t/ - Home\n\t\t/user - User Routes\n\t\t\t/user/ping - Ping Route\n\t\t\t/user/signup - Signup Route"
+  return "<h1>Money Keeper API Server</h1>"
 })
 
 app.get('/health', (_, res) => {
@@ -40,5 +40,5 @@ app.listen({ port: parseInt(env.SERVER_PORT || "3000"), host: '0.0.0.0' }, err =
     app.log.error(err)
     process.exit(1)
   }
-  console.log(`🚀 MoneyKeeper API Server Ready at https://moneykeeper-api.up.railway.app:${env.SERVER_PORT || "3000"}`)
+  console.log(`🚀 MoneyKeeper API Server Ready at http://localhost:${env.SERVER_PORT || "3000"}`)
 })
