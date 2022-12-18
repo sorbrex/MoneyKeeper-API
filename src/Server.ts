@@ -8,8 +8,7 @@ import cors from '@fastify/cors'
 import { env } from 'process'
 import { PrivateRoutes } from './Routes/PrivateRoutes'
 
-const app: FastifyInstance = fastify({ logger: false })
-let IS_UP = false
+const app: FastifyInstance = fastify({ logger: true })
 
 app.register(cors, {
   hook: 'preHandler',
@@ -41,5 +40,5 @@ app.listen({ port: parseInt(env.SERVER_PORT || "3000") }, err => {
     app.log.error(err)
     process.exit(1)
   }
-  console.log(`🚀 MoneyKeeper API Server Ready At => http://localhost:${env.SERVER_PORT || "3000"}`)
+  console.log(`🚀 MoneyKeeper API Server Ready`)
 })
