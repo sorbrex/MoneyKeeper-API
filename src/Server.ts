@@ -35,10 +35,10 @@ app.register(AppRoutes, { prefix: '/app' })
 app.register(ContactRoutes, { prefix: '/contact' })
 app.register(PrivateRoutes, { prefix: '/private' })
 
-app.listen({ port: parseInt(env.SERVER_PORT || "3000"), host: '0.0.0.0' }, err => {
+app.listen({ port: parseInt(env.SERVER_PORT || "3000"), host: 'moneykeeper-api.up.railway.app' }, err => {
   if (err) {
     app.log.error(err)
     process.exit(1)
   }
-  console.log(`🚀 MoneyKeeper API Server Ready`)
+  console.log(`🚀 MoneyKeeper API Server Ready at https://moneykeeper-api.up.railway.app/:${env.SERVER_PORT || "3000"}`)
 })
