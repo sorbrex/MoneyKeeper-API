@@ -17,7 +17,7 @@ export async function UserRoutes(app: FastifyInstance) {
     try {
 
       //Check If User With Same Email Exists
-      const result = await DB.user.findUnique({
+      const result = await DB.users.findUnique({
         where: {
           email: userData.email
         }
@@ -28,7 +28,7 @@ export async function UserRoutes(app: FastifyInstance) {
       }
 
       //User Doesn't Exist, Create New User
-      let userCreated = await DB.user.create({
+      let userCreated = await DB.users.create({
         data: {
           name: userData.name,
           surname: userData.surname,
@@ -94,7 +94,7 @@ export async function UserRoutes(app: FastifyInstance) {
       }
 
       //Token Is Valid, Update User
-      await DB.user.update({
+      await DB.users.update({
         where: {
           id: result.userId
         },
@@ -119,7 +119,7 @@ export async function UserRoutes(app: FastifyInstance) {
 
   // 3 - Login Route
   app.post('/login', async (request: any, reply: any) => {
-    const result = await app.prisma.user.findUnique({
+    const result = await app.prisma.users.findUnique({
       where: {
         email: request.body.email
       }

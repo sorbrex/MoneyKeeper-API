@@ -4,8 +4,10 @@
   "description": "Backend for MoneyKeeper Web Application",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "npx ts-node src/Server.ts",
-    "generate": "npx prisma generate"
+    "generate": "npx prisma generate",
+    "build": "npx tsc",
+    "start": "node dist/src/Server.js",
+    "dev": "npx ts-node src/Server.ts"
   },
   "repository": {
     "type": "git",
