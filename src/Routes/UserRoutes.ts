@@ -117,6 +117,11 @@ export async function UserRoutes(app: FastifyInstance) {
     }
   })
 
+  app.get({
+    '/verifyJwt',
+
+  })
+
   // 3 - Login Route
   app.post('/login', async (request: any, reply: any) => {
     const result = await app.prisma.users.findUnique({

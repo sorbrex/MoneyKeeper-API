@@ -22,6 +22,7 @@ app.get('/health', (_, res) => {
   if (!prismaPlugin || !Mailer) {
     return res.status(500).send({ error: 'Server is not up' })
   }
+
   return res.status(200)
 })
 
