@@ -1,4 +1,4 @@
-import { IConfirmSchema, ISignUpSchema } from "../Interfaces/Interfaces"
+import { IConfirmSchema, IJWTVerifySchema, ISignUpSchema, ILoginSchema } from "../Interfaces/Interfaces"
 import getTemplate from "../Utils/MailTemplates"
 import { FastifyInstance } from "fastify"
 import JWT from 'jsonwebtoken'
@@ -117,28 +117,77 @@ export async function UserRoutes(app: FastifyInstance) {
     }
   })
 
-  app.get({
-    '/verifyJwt',
-
+  app.get('/verifyJwt', IJWTVerifySchema, async (request: any, reply: any) => {
+    const token = request.body.jwt
+    try {
+      const decoded = JWT.verify(token, process.env.SECRET || '')
+      return reply.code(200).send({ message: 'Token Valid' })
+    } catch (err) {
+      return reply.code(401).send({ message: 'Token Invalid', error: err })
+    }
   })
 
   // 3 - Login Route
-  app.post('/login', async (request: any, reply: any) => {
-    const result = await app.prisma.users.findUnique({
-      where: {
-        email: request.body.email
+  app.post('/login', ILoginSchema, async (request: any, reply: any) => {
+    try {
+      //Check If User Exists
+      const dbUser = await app.prisma.users.findUnique({
+        where: {
+          email: request.body.email
+        }
+      })
+
+      if (!dbUser) {
+        return reply.code(404).send({ message: 'User not found' })
       }
-    })
 
-    if (!result) {
-      return reply.code(404).send({ message: 'User not found' })
+      //Check If Password Is Correct
+      if (dbUser.password !== request.body.password) {
+        return reply.code(401).send({ message: 'Invalid password' })
+      }
+
+      //Password Is Correct, Generate JWT Token
+      const generatedToken = JWT.sign({
+        data: {
+          id: dbUser.id,
+          email: dbUser.email
+        }
+      }, 'secret', { expiresIn: '24h' });
+
+      //Check If JWT Token Exists
+      let savedJwt = await app.prisma.jWT.findUnique({
+        where: {
+          userId: dbUser.id
+        }
+      })
+
+      //Save JWT On Database
+      if (savedJwt) {
+        await app.prisma.jWT.update({
+          where: {
+            userId: dbUser.id
+          },
+          data: {
+            token: generatedToken
+          }
+        })
+      } else {
+        await app.prisma.jWT.create({
+          data: {
+            token: generatedToken,
+            userId: dbUser.id
+          }
+        })
+      }
+
+      //Return JWT Token
+      return reply.code(200).send({
+        message: 'Login success',
+        token: generatedToken
+      })
+    } catch {
+      return reply.code(500).send({ message: 'Internal Server Error' })
     }
-
-    if (result.password !== request.body.password) {
-      return reply.code(401).send({ message: 'Invalid password' })
-    }
-
-    return reply.code(200).send({ message: 'Login success' })
   })
 
   // 4 - Logout Route
