@@ -23,7 +23,7 @@ export async function UserRoutes(app: FastifyInstance) {
         }
       })
 
-      if (result) {
+      if (result && result.completed) {
         return reply.code(409).send({ message: 'User Already Exists' })
       }
 
@@ -38,7 +38,7 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //User Created, Generate JWT Token for Confirmation Email
-      let token = JWT.sign(userData, process.env.SECRET || '');
+      let token = JWT.sign(userData, process.env.JWT_SECRET_KEY || '');
       await DB.jWT.create({
         data: {
           token: token,
@@ -53,11 +53,20 @@ export async function UserRoutes(app: FastifyInstance) {
       await app.transporter.sendMail({
         from: {
           name: 'Money Keeper',
-          address: process.env.USERNAME || '',
+          address: process.env.NODEMAILER_USERNAME || '',
         },
         to: userCreated.email,
         subject: 'Money Keeper Registration',
         html: getTemplate('confirm', confirmationURL),
+      })
+
+      await app.prisma.users.update({
+        where: {
+          id: userCreated.id
+        },
+        data: {
+          completed: true
+        }
       })
 
       console.log('[User Creation] Email Sent')
@@ -117,10 +126,10 @@ export async function UserRoutes(app: FastifyInstance) {
     }
   })
 
-  app.get('/verifyJwt', IJWTVerifySchema, async (request: any, reply: any) => {
+  app.post('/verifyJwt', IJWTVerifySchema, async (request: any, reply: any) => {
     const token = request.body.jwt
     try {
-      const decoded = JWT.verify(token, process.env.SECRET || '')
+      const decoded = JWT.verify(token, process.env.JWT_SECRET_KEY || '')
       return reply.code(200).send({ message: 'Token Valid' })
     } catch (err) {
       return reply.code(401).send({ message: 'Token Invalid', error: err })
@@ -138,7 +147,11 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       if (!dbUser) {
-        return reply.code(404).send({ message: 'User not found' })
+        return reply.code(404).send({ message: 'User Not Found' })
+      }
+
+      if (!dbUser.active) {
+        return reply.code(401).send({ message: 'User Not Active' })
       }
 
       //Check If Password Is Correct
@@ -152,7 +165,7 @@ export async function UserRoutes(app: FastifyInstance) {
           id: dbUser.id,
           email: dbUser.email
         }
-      }, 'secret', { expiresIn: '24h' });
+      }, process.env.JWT_SECRET_KEY || '', { expiresIn: '24h' });
 
       //Check If JWT Token Exists
       let savedJwt = await app.prisma.jWT.findUnique({
@@ -190,11 +203,6 @@ export async function UserRoutes(app: FastifyInstance) {
     }
   })
 
-  // 4 - Logout Route
-  app.post('/logout', async (request: any, reply: any) => {
-    return reply.code(200).send({ message: 'Logout success' })
-  })
-
   // 5 - Reset Password Route
   app.post('/reset', async (request: any, reply: any) => {
     return reply.code(200).send({ message: 'Reset success' })
@@ -212,7 +220,17 @@ export async function UserRoutes(app: FastifyInstance) {
 
   // 8 - Delete Account Route
   app.delete('/delete', async (request: any, reply: any) => {
-    return reply.code(200).send({ message: 'Delete Account success' })
+    try {
+      await app.prisma.users.delete({
+        where: {
+          id: request.body.id,
+          email: request.body.email
+        }
+      })
+      return reply.code(200).send({ message: 'Account Deleted' })
+    } catch (err) {
+      return reply.code(500).send({ message: 'Internal Server Error', error: err })
+    }
   })
 
 
