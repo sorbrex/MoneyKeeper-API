@@ -7,7 +7,8 @@
     "generate": "npx prisma generate",
     "build": "npx tsc",
     "start": "node dist/src/Server.js",
-    "dev": "npx ts-node src/Server.ts"
+    "dev": "npx ts-node src/Server.ts",
+    "deploy": "npm version patch && git push && git push --tags"
   },
   "repository": {
     "type": "git",
