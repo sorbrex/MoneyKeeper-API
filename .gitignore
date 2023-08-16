@@ -31,3 +31,4 @@ node_modules/
 # Others
 .DS_Store
 Tutorial/
+.idea
