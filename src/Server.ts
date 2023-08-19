@@ -23,7 +23,7 @@ app.register(require('@fastify/static'), {
 
 app.get('/', (_, res) => {
   return res.status(200).send(
-    "<body><h1>Money Keeper API Server</h1></body>"
+    "Money Keeper API Server"
   ).type('text/html')
 })
 
