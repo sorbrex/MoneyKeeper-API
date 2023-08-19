@@ -24,7 +24,7 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       if (result && result.completed) {
-        return reply.code(409).send({ message: 'User Already Exists' })
+        return reply.code(409).send({ message: 'User Already Exists' }).sendFile("Error.html")
       }
 
       //User Doesn't Exist, Create New User
@@ -38,7 +38,7 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //User Created, Generate JWT Token for Confirmation Email
-      let token = JWT.sign(userData, process.env.JWT_SECRET_KEY || '');
+      let token = JWT.sign(userData, process.env.JWT_SECRET_KEY || '')
       await DB.jWT.create({
         data: {
           token: token,
@@ -47,7 +47,7 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //JWT Token Created, generate Confirmation URL
-      const confirmationURL = `${process.env.BASE_URL}/user/confirm/${token}`
+      const confirmationURL = `${process.env.BASE_URL}/user/confirm?jwt=${token}`
 
       //Send Confirmation Email
       await app.transporter.sendMail({
@@ -69,20 +69,19 @@ export async function UserRoutes(app: FastifyInstance) {
         }
       })
 
-      console.log('[User Creation] Email Sent')
       return reply.code(200).send({ message: 'User Created. Email Sent.' })
 
     } catch (err) {
       console.log("[User Creation Error] => ", err)
-      return reply.code(500).send({ message: 'Internal Server Error', error: err })
+      return reply.code(500).send({ message: 'Internal Server Error', error: err }).sendFile("Error.html")
     }
   })
 
   // 2 - Confirm Route
-  app.patch('/confirm/:token', IConfirmSchema, async (request: any, reply: any) => {
+  app.get('/confirm', IConfirmSchema, async (request: any, reply: any) => {
     try {
       const DB = app.prisma
-      const token = request.params.token
+      const token = request.query.jwt
 
       //Check If Token Exists
       const result = await DB.jWT.findUnique({
@@ -92,14 +91,14 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       if (!result) {
-        return reply.code(404).send({ message: 'Token Not Found' })
+        return reply.code(404).send({ message: 'Token Not Found' }).sendFile("Error.html")
       }
 
       //Token Exists, Check If Token Is Valid
-      let decoded = JWT.verify(token, process.env.SECRET || '')
+      let decoded = JWT.verify(token, process.env.JWT_SECRET_KEY || '')
 
       if (!decoded) {
-        return reply.code(401).send({ message: 'Token Invalid' })
+        return reply.code(401).send({ message: 'Invalid Token.' }).sendFile("Error.html")
       }
 
       //Token Is Valid, Update User
@@ -119,10 +118,11 @@ export async function UserRoutes(app: FastifyInstance) {
         }
       })
 
+      return reply.sendFile('myHtml.html').status(200).message('User Confirmed')
 
     } catch (err) {
       console.log(err)
-      return reply.code(500).send({ message: 'Internal Server Error', error: err })
+      return reply.code(500).send({ message: 'Internal Server Error', error: err }).sendFile("Error.html")
     }
   })
 

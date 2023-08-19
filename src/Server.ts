@@ -7,6 +7,7 @@ import Mailer from './Plugins/Mailer'
 import cors from '@fastify/cors'
 import { env } from 'process'
 import { PrivateRoutes } from './Routes/PrivateRoutes'
+import path from 'path'
 
 const app: FastifyInstance = fastify({ logger: true })
 
@@ -14,8 +15,16 @@ app.register(cors, {
   hook: 'preHandler',
 })
 
-app.get('/', () => {
-  return "<h1>Money Keeper API Server</h1>"
+app.register(require('@fastify/static'), {
+  root: path.join(__dirname, 'public')
+})
+
+
+
+app.get('/', (_, res) => {
+  return res.status(200).send(
+    "<body><h1>Money Keeper API Server</h1></body>"
+  ).type('text/html')
 })
 
 app.get('/health', (_, res) => {
