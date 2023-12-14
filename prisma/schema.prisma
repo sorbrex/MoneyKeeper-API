@@ -1,6 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// When Move to another pc and rewrite the .env file, run npx prisma generate
+
 generator client {
   provider = "prisma-client-js"
 }
