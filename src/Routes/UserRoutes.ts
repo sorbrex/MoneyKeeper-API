@@ -24,7 +24,8 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       if (result && result.completed) {
-        return reply.code(409).send({ message: 'User Already Exists' }).sendFile("Error.html")
+        console.error("User Already Exists")
+        return reply.code(409).send({ message: 'Internal Server Error', error: "User Already Exists" })
       }
 
       //User Doesn't Exist, Create New User
@@ -73,7 +74,7 @@ export async function UserRoutes(app: FastifyInstance) {
 
     } catch (err) {
       console.log("[User Creation Error] => ", err)
-      return reply.code(500).send({ message: 'Internal Server Error', error: err }).sendFile("Error.html")
+      return reply.code(500).sendFile("Error.html")
     }
   })
 
@@ -83,6 +84,10 @@ export async function UserRoutes(app: FastifyInstance) {
       const DB = app.prisma
       const token = request.query.jwt
 
+      if (!token) {
+        return reply.code(400).sendFile("Error.html")
+      }
+
       //Check If Token Exists
       const result = await DB.jWT.findUnique({
         where: {
@@ -91,14 +96,16 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       if (!result) {
-        return reply.code(404).send({ message: 'Token Not Found' }).sendFile("Error.html")
+        console.error("Token Not Found")
+        return reply.code(404).sendFile("Error.html")
       }
 
       //Token Exists, Check If Token Is Valid
       let decoded = JWT.verify(token, process.env.JWT_SECRET_KEY || '')
 
       if (!decoded) {
-        return reply.code(401).send({ message: 'Invalid Token.' }).sendFile("Error.html")
+        console.error("Invalid Token Provided")
+        return reply.code(401).sendFile("Error.html")
       }
 
       //Token Is Valid, Update User
@@ -118,11 +125,11 @@ export async function UserRoutes(app: FastifyInstance) {
         }
       })
 
-      return reply.sendFile('myHtml.html').status(200).message('User Confirmed')
+      return reply.sendFile('Redirect.html').status(200).message('User Confirmed')
 
     } catch (err) {
       console.log(err)
-      return reply.code(500).send({ message: 'Internal Server Error', error: err }).sendFile("Error.html")
+      return reply.code(500).sendFile("Error.html").message(err)
     }
   })
 
