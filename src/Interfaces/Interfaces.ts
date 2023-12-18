@@ -54,12 +54,8 @@ export const IConfirmSchema = {
 
 export const IJWTVerifySchema = {
   schema: {
-    body: {
-      type: 'object',
-      required: ['jwt'],
-      properties: {
-        jwt: { type: 'string' }
-      },
+    querystring: {
+      jwt: { type: 'string' }
     },
     response: {
       200: {

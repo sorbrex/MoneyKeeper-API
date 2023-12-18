@@ -17,11 +17,9 @@ app.register(cors, {
 })
 
 app.register(fastifyStatic, {
-  root: path.join(__dirname, 'public'),
+  root: path.join(__dirname, 'Public'),
   decorateReply: true,
 })
-
-
 
 app.get('/', (_, res) => {
   return res.status(200).send(

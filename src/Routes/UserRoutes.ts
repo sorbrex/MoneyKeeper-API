@@ -153,17 +153,18 @@ export async function UserRoutes(app: FastifyInstance) {
     }
   })
 
-  app.post('/verifyJwt', IJWTVerifySchema, async (request: any, reply: any) => {
-    const token = request.body.jwt
+  // 4 - Verify JWT Route (Saved Login Session)
+  app.get('/verifyJwt', IJWTVerifySchema, async (request: any, reply: any) => {
+    const hashedToken = request.query.jwt
 
     try {
-      if (!token) {
+      if (!hashedToken) {
         return reply.code(400).send({ message: 'Token Not Provided' })
       }
 
       const tokenObject = await app.prisma.jWT.findUnique({
         where: {
-          hashed: token
+          hashed: hashedToken
         }
       })
 
