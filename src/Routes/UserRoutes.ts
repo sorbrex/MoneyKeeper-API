@@ -87,9 +87,9 @@ export async function UserRoutes(app: FastifyInstance) {
   app.get('/confirm', IConfirmSchema, async (request: any, reply: any) => {
     try {
       const DB = app.prisma
-      const token = request.query.jwt
+      const hashedToken = request.query.jwt
 
-      if (!token) {
+      if (!hashedToken) {
         reply.sendFile("Error.html")
         reply.code(400)
         return reply
@@ -98,7 +98,7 @@ export async function UserRoutes(app: FastifyInstance) {
       //Check If Token Exists
       const result = await DB.jWT.findUnique({
         where: {
-          hashed: token
+          hashed: hashedToken
         }
       })
 
@@ -116,7 +116,7 @@ export async function UserRoutes(app: FastifyInstance) {
         //Token Is Invalid, Delete Token
         await DB.jWT.delete({
           where: {
-            token: token
+            hashed: hashedToken
           }
         })
 
@@ -139,7 +139,7 @@ export async function UserRoutes(app: FastifyInstance) {
       //User Updated, Delete Token
       await DB.jWT.delete({
         where: {
-          token: token
+          hashed: hashedToken
         }
       })
       reply.sendFile("Redirect.html")
