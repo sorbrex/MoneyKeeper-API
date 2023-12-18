@@ -88,7 +88,7 @@ export async function UserRoutes(app: FastifyInstance) {
       const token = request.query.jwt
 
       if (!token) {
-        return reply.code(400).sendFile("Error.html")
+        return reply.sendFile("Error.html").code(404)
       }
 
       //Check If Token Exists
@@ -100,7 +100,7 @@ export async function UserRoutes(app: FastifyInstance) {
 
       if (!result) {
         console.error("Token Not Found")
-        return reply.code(404).sendFile("Error.html")
+        return reply.sendFile("Error.html").code(404)
       }
 
       //Token Exists, Check If Token Is Valid
@@ -115,7 +115,7 @@ export async function UserRoutes(app: FastifyInstance) {
         })
 
         console.error("Invalid Token Provided")
-        return reply.code(401).sendFile("Error.html")
+        return reply.sendFile("Error.html").code(401)
       }
 
       //Token Is Valid, Update User
@@ -139,7 +139,7 @@ export async function UserRoutes(app: FastifyInstance) {
 
     } catch (err) {
       console.log(err)
-      return reply.code(500).sendFile("Error.html").message(err)
+      return reply.sendFile("Error.html").code(500).message(err)
     }
   })
 
