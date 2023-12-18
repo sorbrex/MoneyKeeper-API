@@ -155,7 +155,7 @@ export async function UserRoutes(app: FastifyInstance) {
 
   // 4 - Verify JWT Route (Saved Login Session)
   app.get('/verifyJwt', IJWTVerifySchema, async (request: any, reply: any) => {
-    const hashedToken = request.query.jwt
+    const hashedToken = request.query.token
 
     try {
       if (!hashedToken) {
