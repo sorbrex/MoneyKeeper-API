@@ -50,5 +50,5 @@ app.listen({ port: parseInt(env.SERVER_PORT || "3000"), host: '0.0.0.0' }, err =
     app.log.error(err)
     process.exit(1)
   }
-  console.log(`🚀 MoneyKeeper API Server Ready at http://localhost:${env.SERVER_PORT || "3000"}`)
+  console.log(`🚀 MoneyKeeper API Server Ready at ${env.BASE_URL}:${env.SERVER_PORT || "8080"}`)
 })
