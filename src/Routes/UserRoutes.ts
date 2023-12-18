@@ -40,7 +40,7 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //User Created, Generate JWT Token for Confirmation Email
-      let token = JWT.sign(userData, process.env.JWT_SECRET_KEY || '')
+      let token = JWT.sign(userData, process.env.JWT_SECRET_KEY || '',{ expiresIn: '48h' })
       let tokenHash = crypto.createHash('sha256').update(token).digest('hex')
       await DB.jWT.create({
         data: {
@@ -145,8 +145,23 @@ export async function UserRoutes(app: FastifyInstance) {
 
   app.post('/verifyJwt', IJWTVerifySchema, async (request: any, reply: any) => {
     const token = request.body.jwt
+
     try {
-      const decoded = JWT.verify(token, process.env.JWT_SECRET_KEY || '')
+      if (!token) {
+        return reply.code(400).send({ message: 'Token Not Provided' })
+      }
+
+      const tokenObject = await app.prisma.jWT.findUnique({
+        where: {
+          hashed: token
+        }
+      })
+
+      if (!tokenObject) {
+        return reply.code(404).send({ message: 'Token Not Found' })
+      }
+
+      const decoded = JWT.verify(tokenObject.token, process.env.JWT_SECRET_KEY || '')
       return reply.code(200).send({ message: 'Token Valid' })
     } catch (err) {
       return reply.code(401).send({ message: 'Token Invalid', error: err })
@@ -184,6 +199,8 @@ export async function UserRoutes(app: FastifyInstance) {
         }
       }, process.env.JWT_SECRET_KEY || '', { expiresIn: '24h' });
 
+      const tokenHash = crypto.createHash('sha256').update(generatedToken).digest('hex')
+
       //Check If JWT Token Exists
       let savedJwt = await app.prisma.jWT.findUnique({
         where: {
@@ -198,6 +215,7 @@ export async function UserRoutes(app: FastifyInstance) {
             userId: dbUser.id
           },
           data: {
+            hashed: tokenHash,
             token: generatedToken
           }
         })
@@ -205,6 +223,7 @@ export async function UserRoutes(app: FastifyInstance) {
         await app.prisma.jWT.create({
           data: {
             token: generatedToken,
+            hashed: tokenHash,
             userId: dbUser.id
           }
         })
@@ -213,7 +232,7 @@ export async function UserRoutes(app: FastifyInstance) {
       //Return JWT Token
       return reply.code(200).send({
         message: 'Login success',
-        token: generatedToken
+        token: tokenHash
       })
     } catch {
       return reply.code(500).send({ message: 'Internal Server Error' })
