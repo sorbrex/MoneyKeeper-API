@@ -2,6 +2,7 @@ import { IConfirmSchema, IJWTVerifySchema, ISignUpSchema, ILoginSchema } from ".
 import getTemplate from "../Utils/MailTemplates"
 import { FastifyInstance } from "fastify"
 import JWT from 'jsonwebtoken'
+import crypto from 'crypto'
 
 export async function UserRoutes(app: FastifyInstance) {
   //Ping Route For Testing
@@ -40,15 +41,17 @@ export async function UserRoutes(app: FastifyInstance) {
 
       //User Created, Generate JWT Token for Confirmation Email
       let token = JWT.sign(userData, process.env.JWT_SECRET_KEY || '')
+      let tokenHash = crypto.createHash('sha256').update(token).digest('hex')
       await DB.jWT.create({
         data: {
           token: token,
+          hashed: tokenHash,
           userId: userCreated.id,
         }
       })
 
       //JWT Token Created, generate Confirmation URL
-      const confirmationURL = `${process.env.BASE_URL}/user/confirm?jwt=${token}`
+      const confirmationURL = `${process.env.BASE_URL}/user/confirm?jwt=${tokenHash}`
 
       //Send Confirmation Email
       await app.transporter.sendMail({
@@ -91,7 +94,7 @@ export async function UserRoutes(app: FastifyInstance) {
       //Check If Token Exists
       const result = await DB.jWT.findUnique({
         where: {
-          token: token
+          hashed: token
         }
       })
 
@@ -101,9 +104,16 @@ export async function UserRoutes(app: FastifyInstance) {
       }
 
       //Token Exists, Check If Token Is Valid
-      let decoded = JWT.verify(token, process.env.JWT_SECRET_KEY || '')
+      let decoded = JWT.verify(result.token, process.env.JWT_SECRET_KEY || '')
 
       if (!decoded) {
+        //Token Is Invalid, Delete Token
+        await DB.jWT.delete({
+          where: {
+            token: token
+          }
+        })
+
         console.error("Invalid Token Provided")
         return reply.code(401).sendFile("Error.html")
       }
