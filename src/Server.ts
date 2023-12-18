@@ -1,5 +1,6 @@
 import { ContactRoutes } from './Routes/ContactRoutes'
 import fastify, { FastifyInstance } from 'fastify'
+import fastifyStatic from "@fastify/static";
 import { UserRoutes } from './Routes/UserRoutes'
 import { AppRoutes } from './Routes/AppRoutes'
 import prismaPlugin from './Plugins/Prisma'
@@ -15,7 +16,7 @@ app.register(cors, {
   hook: 'preHandler',
 })
 
-app.register(require('@fastify/static'), {
+app.register(fastifyStatic, {
   root: path.join(__dirname, 'public')
 })
 
