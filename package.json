@@ -1,6 +1,6 @@
 {
   "name": "moneykeeper-api",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Backend for MoneyKeeper Web Application",
   "main": "dist/index.js",
   "scripts": {
