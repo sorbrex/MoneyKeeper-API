@@ -143,7 +143,8 @@ export async function UserRoutes(app: FastifyInstance) {
           hashed: hashedToken
         }
       })
-      reply.sendFile("Redirect.html")
+
+      reply.redirect(`${process.env.BASE_UI_URL}/#/login`)
       reply.status(200)
       return reply
     } catch (err) {
@@ -279,7 +280,7 @@ export async function UserRoutes(app: FastifyInstance) {
         minNumber: 2
       })
 
-      const loginUrl = `${process.env.BASE_UI_URL}/login`
+      const loginUrl = `${process.env.BASE_UI_URL}/#/login`
 
       //Send Confirmation Email
       await app.transporter.sendMail({
