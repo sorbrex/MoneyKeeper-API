@@ -144,8 +144,12 @@ export default function getTemplate(request: TemplateRequest, url: string, passw
               <p style="margin: 0;"> Tap the button below to ${request === "reset" ? "Login with your new password" :
       "confirm your email address"}. <br> If you didn't make this request, you can safely delete this email.
               </p>
-              <br>
-              <p style="margin: 0;"> Your Temporary Password is: <b>${ password }</b>
+              {
+                password && request === "reset" ? "
+                    <br>
+                    <p style="margin: 0;"> Your Temporary Password is: <b>${ password }</b>
+                " : ""
+              }
             </td>
           </tr>
           <!--Message -->
