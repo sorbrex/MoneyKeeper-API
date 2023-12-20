@@ -13,3 +13,4 @@ NodeMailer -> Email Sending
 Prisma -> ORM
 MongoDB -> Database
 Render -> Hosting
+ClickUp -> Project Management
