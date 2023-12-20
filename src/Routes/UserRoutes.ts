@@ -279,7 +279,7 @@ export async function UserRoutes(app: FastifyInstance) {
         minNumber: 2
       })
 
-      const loginUrl = `${process.env.BASE_URL}/login`
+      const loginUrl = `${process.env.BASE_UI_URL}/login`
 
       //Send Confirmation Email
       await app.transporter.sendMail({
