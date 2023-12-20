@@ -148,9 +148,9 @@ export default function getTemplate(request: TemplateRequest, url: string, passw
               <p style="margin: 0;"> ${ password ? "Your Temporary Password is: <b>" + password + "</b>" : ""} </p>
             </td>
           </tr>
-          <!--Message -->
+          <!-- Message -->
 
-          <!--Button -->
+          <!-- Button -->
           <tr>
             <td align="left" bgcolor="#ffffff">
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
