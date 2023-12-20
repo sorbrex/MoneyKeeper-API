@@ -29,7 +29,7 @@
   "homepage": "https://github.com/sorbrex/MoneyKeeper-API#readme",
   "dependencies": {
     "@fastify/static": "^6.10.2",
-    "@prisma/client": "^4.6.1",
+    "@prisma/client": "^5.7.1",
     "crypto-js": "^4.1.1",
     "fastify": "^4.10.2",
     "fastify-plugin": "^4.3.0",
