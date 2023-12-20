@@ -1,8 +1,9 @@
-import { IConfirmSchema, IJWTVerifySchema, ISignUpSchema, ILoginSchema } from "../Interfaces/Interfaces"
+import {IConfirmSchema, IJWTVerifySchema, ISignUpSchema, ILoginSchema, IResetSchema} from "../Interfaces/Interfaces"
 import getTemplate from "../Utils/MailTemplates"
 import { FastifyInstance } from "fastify"
 import JWT from 'jsonwebtoken'
 import crypto from 'crypto'
+import {generatePassword} from "../Utils/Utils";
 
 export async function UserRoutes(app: FastifyInstance) {
   //Ping Route For Testing
@@ -251,13 +252,64 @@ export async function UserRoutes(app: FastifyInstance) {
   })
 
   // 5 - Reset Password Route
-  app.post('/reset', async (request: any, reply: any) => {
-    return reply.code(200).send({ message: 'Reset success' })
-  })
+  app.post('/reset', IResetSchema, async (request: any, reply: any) => {
+    try{
 
-  // 6 - Confirm Reset Password Route
-  app.post('/confirm-reset', async (request: any, reply: any) => {
-    return reply.code(200).send({ message: 'Confirm Reset success' })
+      //Check If User Exists
+      const dbUser = await app.prisma.users.findUnique({
+        where: {
+          email: request.body.email
+        }
+      })
+
+      if (!dbUser) {
+        return reply.code(404).send({ message: 'User Not Found' })
+      }
+
+      if (!dbUser.active) {
+        return reply.code(401).send({ message: 'User Not Active' })
+      }
+
+      //Generate New Password
+      const superSecretPassword = generatePassword({
+        length: 12,
+        minSpecial: 2,
+        minLowercase: 2,
+        minUppercase: 2,
+        minNumber: 2
+      })
+
+      const loginUrl = `${process.env.BASE_URL}/login`
+
+      //Send Confirmation Email
+      await app.transporter.sendMail({
+        from: {
+          name: 'Money Keeper',
+          address: process.env.NODEMAILER_USERNAME || '',
+        },
+        to: request.body.email,
+        subject: 'Money Keeper Password Reset',
+        html: getTemplate('reset', loginUrl, superSecretPassword),
+      })
+
+
+      await app.prisma.users.update({
+        where: {
+          email: request.body.email
+        },
+        data: {
+          password: crypto.createHash('sha256').update(superSecretPassword).digest('hex')
+        }
+      })
+
+      return reply.code(200).send({ message: 'Password Reset. Email Sent With New Password.' })
+
+    } catch (err) {
+      console.log("[Password Reset Error] => ", err)
+      reply.sendFile("Error.html")
+      reply.code(500)
+      return reply
+    }
   })
 
   // 7 - Change Password Route

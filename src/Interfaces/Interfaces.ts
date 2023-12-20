@@ -122,3 +122,42 @@ export const ILoginSchema = {
     }
   }
 }
+
+export const IResetSchema = {
+  schema: {
+    body: {
+      type: 'object',
+      required: ['email'],
+      properties: {
+        email: { type: 'string' },
+      },
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+        },
+      },
+      404: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      401: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      500: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          error: { type: 'string' }
+        }
+      }
+    }
+  }
+}

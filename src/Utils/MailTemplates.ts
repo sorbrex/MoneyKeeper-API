@@ -1,6 +1,6 @@
 import { TemplateRequest } from "src/Types/Types"
 
-export default function getTemplate(request: TemplateRequest, url: string) {
+export default function getTemplate(request: TemplateRequest, url: string, password?: string) {
   return `
 <!DOCTYPE html>
 <html>
@@ -8,7 +8,7 @@ export default function getTemplate(request: TemplateRequest, url: string) {
 <head>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>Password Reset</title>
+  <title>${request === "reset" ? "Reset Password" : "Confirm Email Address"}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style type="text/css">
     @media screen {
@@ -141,9 +141,11 @@ export default function getTemplate(request: TemplateRequest, url: string) {
           <tr>
             <td align="left" bgcolor="#ffffff"
               style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-              <p style="margin: 0;"> Tap the button below to ${request === "reset" ? "reset your account password" :
+              <p style="margin: 0;"> Tap the button below to ${request === "reset" ? "Login with your new password" :
       "confirm your email address"}. <br> If you didn't make this request, you can safely delete this email.
               </p>
+              <br>
+              <p style="margin: 0;"> Your Temporary Password is: <b>${ password }</b>
             </td>
           </tr>
           <!--Message -->
@@ -159,7 +161,7 @@ export default function getTemplate(request: TemplateRequest, url: string) {
                         <td align="center" bgcolor="#1a82e2" style="border-radius: 6px;">
                           <a href=${url} target="_blank"
                             style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">
-                            ${request === "reset" ? "Reset Password" : "Confirm Email"}
+                            ${request === "reset" ? "Login" : "Confirm Email"}
                           </a>
                         </td>
                       </tr>
