@@ -1,5 +1,4 @@
-export function generatePassword(
-	args: {
+export function generatePassword(args: {
 		length: number,
 		minUppercase: number,
 		minLowercase: number,

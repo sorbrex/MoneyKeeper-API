@@ -84,7 +84,7 @@ export async function UserRoutes(app: FastifyInstance) {
     }
   })
 
-  // 2 - Confirm Route
+  // 2 - Confirm Route (When The User Click On The Email Link)
   app.get('/confirm', IConfirmSchema, async (request: any, reply: any) => {
     try {
       const DB = app.prisma
@@ -155,32 +155,6 @@ export async function UserRoutes(app: FastifyInstance) {
     }
   })
 
-  // 4 - Verify JWT Route (Saved Login Session)
-  app.get('/verifyJwt', IJWTVerifySchema, async (request: any, reply: any) => {
-    const hashedToken = request.query.token
-
-    try {
-      if (!hashedToken) {
-        return reply.code(400).send({ message: 'Token Not Provided' })
-      }
-
-      const tokenObject = await app.prisma.jWT.findUnique({
-        where: {
-          hashed: hashedToken
-        }
-      })
-
-      if (!tokenObject) {
-        return reply.code(404).send({ message: 'Token Not Found' })
-      }
-
-      const decoded = JWT.verify(tokenObject.token, process.env.JWT_SECRET_KEY || '')
-      return reply.code(200).send({ message: 'Token Valid' })
-    } catch (err) {
-      return reply.code(401).send({ message: 'Token Invalid', error: err })
-    }
-  })
-
   // 3 - Login Route
   app.post('/login', ILoginSchema, async (request: any, reply: any) => {
     try {
@@ -212,40 +186,10 @@ export async function UserRoutes(app: FastifyInstance) {
         }
       }, process.env.JWT_SECRET_KEY || '', { expiresIn: '24h' });
 
-      const tokenHash = crypto.createHash('sha256').update(generatedToken).digest('hex')
-
-      //Check If JWT Token Exists
-      let savedJwt = await app.prisma.jWT.findUnique({
-        where: {
-          userId: dbUser.id
-        }
-      })
-
-      //Save JWT On Database
-      if (savedJwt) {
-        await app.prisma.jWT.update({
-          where: {
-            userId: dbUser.id
-          },
-          data: {
-            hashed: tokenHash,
-            token: generatedToken
-          }
-        })
-      } else {
-        await app.prisma.jWT.create({
-          data: {
-            token: generatedToken,
-            hashed: tokenHash,
-            userId: dbUser.id
-          }
-        })
-      }
-
       //Return JWT Token
       return reply.code(200).send({
         message: 'Login success',
-        token: tokenHash
+        token: generatedToken
       })
     } catch {
       return reply.code(500).send({ message: 'Internal Server Error' })
@@ -312,26 +256,5 @@ export async function UserRoutes(app: FastifyInstance) {
       return reply
     }
   })
-
-  // 7 - Change Password Route
-  app.post('/change-password', async (request: any, reply: any) => {
-    return reply.code(200).send({ message: 'Change Password success' })
-  })
-
-  // 8 - Delete Account Route
-  app.delete('/delete', async (request: any, reply: any) => {
-    try {
-      await app.prisma.users.delete({
-        where: {
-          id: request.body.id,
-          email: request.body.email
-        }
-      })
-      return reply.code(200).send({ message: 'Account Deleted' })
-    } catch (err) {
-      return reply.code(500).send({ message: 'Internal Server Error', error: err })
-    }
-  })
-
 
 }
