@@ -7,10 +7,22 @@ import prismaPlugin from './Plugins/Prisma'
 import Mailer from './Plugins/Mailer'
 import cors from '@fastify/cors'
 import { env } from 'process'
-import { PrivateRoutes } from './Routes/PrivateRoutes'
+import { TestRoutes } from './Routes/TestRoutes'
 import path from 'path'
+import multipart from '@fastify/multipart'
+import formbody from '@fastify/formbody'
 
 const app: FastifyInstance = fastify({ logger: true })
+
+app.register(multipart, {
+  attachFieldsToBody: true,
+  limits: {
+    files: 1,
+    fileSize: 5 * 1024 * 1024,
+  },
+})
+
+app.register(formbody)
 
 app.register(cors, {
   hook: 'preHandler',
@@ -43,7 +55,7 @@ app.register(Mailer)
 app.register(UserRoutes, { prefix: '/user' })
 app.register(AppRoutes, { prefix: '/app' })
 app.register(ContactRoutes, { prefix: '/contact' })
-app.register(PrivateRoutes, { prefix: '/private' })
+app.register(TestRoutes, { prefix: '/test' })
 
 app.listen({ port: parseInt(env.SERVER_PORT || "3000"), host: '0.0.0.0' }, err => {
   if (err) {

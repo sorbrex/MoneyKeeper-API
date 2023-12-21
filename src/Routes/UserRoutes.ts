@@ -1,4 +1,4 @@
-import {IConfirmSchema, IJWTVerifySchema, ISignUpSchema, ILoginSchema, IResetSchema} from "../Interfaces/Interfaces"
+import {IConfirmSchema, ISignUpSchema, ILoginSchema, IResetSchema} from "../Interfaces/Interfaces"
 import getTemplate from "../Utils/MailTemplates"
 import { FastifyInstance } from "fastify"
 import JWT from 'jsonwebtoken'

@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify"
 import JWT from "jsonwebtoken";
 import {IJWTVerifySchema} from "../Interfaces/Interfaces";
 
+
 export async function AppRoutes(app: FastifyInstance) {
 
   app.addHook('onRequest', async (request, reply) => {
@@ -41,6 +42,7 @@ export async function AppRoutes(app: FastifyInstance) {
     //We have a Hook that verify the JWT on every request, so if we reach this route the JWT is valid
     return reply.code(200).send({ message: 'Token Valid' })
   })
+
 
   // 7 - Change Password Route
   app.post('/change-password', async (request: any, reply: any) => {
