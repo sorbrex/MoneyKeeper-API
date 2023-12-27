@@ -1,20 +1,17 @@
 import { FastifyInstance } from "fastify"
 import JWT from "jsonwebtoken";
-import {IJWTVerifySchema} from "../Interfaces/Interfaces";
+import { IJWTVerifySchema } from "../Interfaces/Interfaces";
 
 
 export async function AppRoutes(app: FastifyInstance) {
 
   app.addHook('onRequest', async (request, reply) => {
-    console.log('onRequest hook')
     try {
       const authToken = request.headers.authorization?.split(' ')[1]
 
       if (!authToken) {
         return reply.code(401).send({ message: 'Token Not Provided' })
       }
-
-      console.log(`\x1B[34m [DEBUG] Headers Token : ${authToken}\x1B[0m`)
 
       let decoded = JWT.verify(authToken, process.env.JWT_SECRET_KEY || '')
 
@@ -23,13 +20,12 @@ export async function AppRoutes(app: FastifyInstance) {
         return reply.code(401).send({ message: 'Invalid Token Provided' })
       }
 
-      console.log(`\x1B[31mData Inside Token: ${JSON.stringify(decoded)}\x1B[0m`)
-
       return reply.code(200).send({ message: 'Token Valid' })
 
     } catch (err) {
       console.log(`\x1B[31mToken Invalid or Expired ${err}\x1B[0m`)
-      return reply.code(401).send({ message: 'Token Invalid', error: err })    }
+      return reply.code(401).send({ message: 'Token Invalid', error: err })
+    }
   })
 
 
