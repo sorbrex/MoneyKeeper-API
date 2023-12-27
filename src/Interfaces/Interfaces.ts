@@ -165,3 +165,48 @@ export const IResetSchema = {
     }
   }
 }
+
+export const IProfilePictureSchema = {
+  schema: {
+    consumes: ['multipart/form-data'],
+    body: {
+      type: 'object',
+      required: ['profilePicture'],
+      properties: {
+        // file that gets decoded to string
+        profilePicture: {
+          type: 'object',
+        },
+      }
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          url: { type: 'string' }
+        },
+      },
+      404: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      401: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      500: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          error: { type: 'string' }
+        }
+      }
+    }
+  }
+}
+

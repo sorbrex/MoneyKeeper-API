@@ -10,19 +10,16 @@ import { env } from 'process'
 import { TestRoutes } from './Routes/TestRoutes'
 import path from 'path'
 import multipart from '@fastify/multipart'
-import formbody from '@fastify/formbody'
 
 const app: FastifyInstance = fastify({ logger: true })
 
 app.register(multipart, {
-  attachFieldsToBody: true,
-  limits: {
+  attachFieldsToBody: 'keyValues',
+   limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
     files: 1,
-    fileSize: 5 * 1024 * 1024,
-  },
+   },
 })
-
-app.register(formbody)
 
 app.register(cors, {
   hook: 'preHandler',

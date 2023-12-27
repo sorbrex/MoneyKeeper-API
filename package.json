@@ -7,7 +7,7 @@
     "generate": "npx prisma generate",
     "build": "npx tsc",
     "start": "node dist/src/Server.js",
-    "dev": "npx nodemon src/Server.ts",
+    "dev": "nodemon src/Server.ts --inspect=8081",
     "deploy": "npm version patch && git push && git push --tags"
   },
   "repository": {
@@ -28,7 +28,6 @@
   },
   "homepage": "https://github.com/sorbrex/MoneyKeeper-API#readme",
   "dependencies": {
-    "@fastify/formbody": "^7.4.0",
     "@fastify/multipart": "^8.0.0",
     "@fastify/static": "^6.10.2",
     "@google-cloud/storage": "^7.7.0",
@@ -47,6 +46,7 @@
     "@types/nodemailer": "^6.4.6",
     "nodemon": "^3.0.1",
     "prisma": "^4.6.1",
+    "ts-node": "^10.9.2",
     "typescript": "^4.9.3"
   }
 }

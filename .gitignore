@@ -34,3 +34,4 @@ Tutorial/
 .idea
 
 dist/
+storage_key.json

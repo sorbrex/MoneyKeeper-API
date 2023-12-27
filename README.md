@@ -4,13 +4,25 @@ https://money-keeper-api.onrender.com
 
 ## Description
 Typescript -> Language
+
 NodeJS -> Backend
+
 Fastify -> Framework
+
 CryptoJS -> Password Encryption
+
 Bitwarden Code -> Password Generator Algorithm
+
 JWT -> User Authentication and Authorization
+
 NodeMailer -> Email Sending
+
 Prisma -> ORM
+
 MongoDB -> Database
+
+Google Cloud Storage -> File Storage
+
 Render -> Hosting
+
 ClickUp -> Project Management
