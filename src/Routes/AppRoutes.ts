@@ -1,6 +1,8 @@
 import { FastifyInstance } from "fastify"
 import JWT from "jsonwebtoken";
-import { IJWTVerifySchema } from "../Interfaces/Interfaces";
+import { IJWTVerifySchema, IProfilePictureSchema } from "../Interfaces/Interfaces";
+import GCStorage from "src/Storage/Storage";
+import { parseHeaderToUserData } from "src/Utils/Utils";
 
 
 export async function AppRoutes(app: FastifyInstance) {
@@ -33,16 +35,52 @@ export async function AppRoutes(app: FastifyInstance) {
     return reply.code(200).send({ message: 'pong' })
   })
 
-  // 4 - Verify JWT (When The User Navigate To The App we check if the JWT saved in his session is valid)
+  // BASIC ROUTES
   app.get('/verifyJwt', IJWTVerifySchema, async (_: any, reply: any) => {
     //We have a Hook that verify the JWT on every request, so if we reach this route the JWT is valid
     return reply.code(200).send({ message: 'Token Valid' })
   })
 
 
-  // 7 - Change Password Route
-  app.post('/change-password', async (request: any, reply: any) => {
-    return reply.code(200).send({ message: 'Change Password success' })
+  // ACCOUNT ROUTES
+
+  app.post('/update-profile-pictures', IProfilePictureSchema, async function (req, reply) {
+    try {
+      const userData = parseHeaderToUserData(req.headers)
+
+      if (!userData) {
+        return reply.code(401).send({ message: 'Invalid Token Provided' })
+      }
+
+      const profilePicture = (req.body as { profilePicture: string }).profilePicture
+      const imageUrl = await GCStorage.uploadFile(profilePicture, `shared/${userData.id}/profile/${Date.now()}_profile_pic.png`)
+
+      return reply.code(200).send({ message: 'Profile Picture Updated', url: imageUrl })
+
+    } catch (err) {
+      console.log(err)
+      return reply.code(500).send({ message: 'Internal Server Error' })
+    }
+  })
+
+  app.post('/change-password', async (req: any, reply: any) => {
+    const userData = parseHeaderToUserData(req.headers)
+    if (!userData) {
+      return reply.code(401).send({ message: 'Invalid Token Provided' })
+    }
+
+    const newPassword = req.body.newPassword
+
+    await app.prisma.users.update({
+      where: {
+        id: userData.id
+      },
+      data: {
+        password: newPassword
+      }
+    })
+
+    return reply.code(200).send({ message: 'Password Changed' })
   })
 
   // 8 - Delete Account Route
