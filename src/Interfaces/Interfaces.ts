@@ -68,7 +68,7 @@ export const IJWTVerifySchema = {
           message: { type: 'string' }
         },
       },
-      401: {
+      '4xx': {
         type: 'object',
         properties: {
           message: { type: 'string' },
@@ -104,13 +104,7 @@ export const ILoginSchema = {
           token: { type: 'string' }
         },
       },
-      404: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' }
-        }
-      },
-      401: {
+      '4xx': {
         type: 'object',
         properties: {
           message: { type: 'string' }
@@ -143,13 +137,7 @@ export const IResetSchema = {
           message: { type: 'string' },
         },
       },
-      404: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' }
-        }
-      },
-      401: {
+      '4xx': {
         type: 'object',
         properties: {
           message: { type: 'string' }
@@ -187,13 +175,7 @@ export const IProfilePictureSchema = {
           url: { type: 'string' }
         },
       },
-      404: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' }
-        }
-      },
-      401: {
+      '4xx': {
         type: 'object',
         properties: {
           message: { type: 'string' }
@@ -216,17 +198,15 @@ export const IAccountInfoSchema = {
       200: {
         type: 'object',
         properties: {
-          message: { type: 'string' },
-          user: { type: 'object' }
-        },
-      },
-      404: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' }
+          id: { type: 'string' },
+          name: { type: 'string' },
+          surname: { type: 'string' },
+          email: { type: 'string' },
+          password: { type: 'string' },
+          remoteImageUrl: { type: 'string' }
         }
       },
-      401: {
+      '4xx': {
         type: 'object',
         properties: {
           message: { type: 'string' }

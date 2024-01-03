@@ -3,6 +3,7 @@ import JWT from "jsonwebtoken";
 import {IAccountInfoSchema, IJWTVerifySchema, IProfilePictureSchema} from "../Interfaces/Interfaces";
 import GCStorage from "../Storage/Storage";
 import { parseHeaderToUserData } from "../Utils/Utils";
+import {User} from "../Types/Types";
 
 
 export async function AppRoutes(app: FastifyInstance) {
@@ -21,8 +22,6 @@ export async function AppRoutes(app: FastifyInstance) {
         console.log('\x1B[31mToken Invalid or Expired\x1B[0m')
         return reply.code(401).send({ message: 'Invalid Token Provided' })
       }
-
-      return reply.code(200).send({ message: 'Token Valid' })
 
     } catch (err) {
       console.log(`\x1B[31mToken Invalid or Expired ${err}\x1B[0m`)
@@ -44,14 +43,10 @@ export async function AppRoutes(app: FastifyInstance) {
 
   // ACCOUNT ROUTES
   app.get('/getAccountInfo', IAccountInfoSchema, async (req: any, reply: any) => {
-    console.log(' ===> Request Received')
-
     const userData = parseHeaderToUserData(req.headers)
     if (!userData) {
       return reply.code(401).send({ message: 'Invalid Token Provided' })
     }
-
-    console.log(' ===> User Data Parsed', userData)
 
     const user = await app.prisma.users.findUnique({
       where: {
@@ -63,8 +58,7 @@ export async function AppRoutes(app: FastifyInstance) {
       return reply.code(404).send({ message: 'User Not Found' })
     }
 
-    console.log(' ===> User Found and Sent', user)
-    return reply.code(200).send({ message: 'User Found', user: user })
+    return reply.code(200).send(user as User)
 
   })
 

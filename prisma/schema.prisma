@@ -15,16 +15,16 @@ datasource db {
 // Rerun "prisma generate" after changing this file
 
 model Users {
-  id          String         @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  surname     String
-  email       String         @unique
-  password    String
-  remoteImage String?
-  active      Boolean        @default(false)
-  completed   Boolean        @default(false)
-  JWT         JWT?
-  Transaction Transactions[]
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  surname        String
+  email          String         @unique
+  password       String
+  remoteImageUrl String?
+  active         Boolean        @default(false)
+  completed      Boolean        @default(false)
+  JWT            JWT?
+  Transaction    Transactions[]
 }
 
 model JWT {
