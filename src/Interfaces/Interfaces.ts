@@ -210,3 +210,35 @@ export const IProfilePictureSchema = {
   }
 }
 
+export const IAccountInfoSchema = {
+  schema: {
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          user: { type: 'object' }
+        },
+      },
+      404: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      401: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      500: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          error: { type: 'string' }
+        }
+      }
+    }
+  }
+}

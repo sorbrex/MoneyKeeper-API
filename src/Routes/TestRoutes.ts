@@ -6,5 +6,4 @@ export async function TestRoutes(app: FastifyInstance) {
     return { pong: 'Test Pong' }
   })
 
-
 }

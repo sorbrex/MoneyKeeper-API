@@ -10,15 +10,16 @@ import { env } from 'process'
 import { TestRoutes } from './Routes/TestRoutes'
 import path from 'path'
 import multipart from '@fastify/multipart'
+import GCStorage from "./Storage/Storage";
 
 const app: FastifyInstance = fastify({ logger: true })
 
 app.register(multipart, {
   attachFieldsToBody: 'keyValues',
-   limits: {
+  limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
     files: 1,
-   },
+  },
 })
 
 app.register(cors, {
@@ -47,6 +48,10 @@ app.get('/health', (_, res) => {
 //Plugins Register
 app.register(prismaPlugin)
 app.register(Mailer)
+
+//Initializers
+console.log('Initializing GCStorage')
+GCStorage.configure()
 
 //Routes Register
 app.register(UserRoutes, { prefix: '/user' })

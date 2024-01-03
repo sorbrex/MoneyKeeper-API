@@ -1,8 +1,8 @@
 import { FastifyInstance } from "fastify"
 import JWT from "jsonwebtoken";
-import { IJWTVerifySchema, IProfilePictureSchema } from "../Interfaces/Interfaces";
-import GCStorage from "src/Storage/Storage";
-import { parseHeaderToUserData } from "src/Utils/Utils";
+import {IAccountInfoSchema, IJWTVerifySchema, IProfilePictureSchema} from "../Interfaces/Interfaces";
+import GCStorage from "../Storage/Storage";
+import { parseHeaderToUserData } from "../Utils/Utils";
 
 
 export async function AppRoutes(app: FastifyInstance) {
@@ -43,6 +43,30 @@ export async function AppRoutes(app: FastifyInstance) {
 
 
   // ACCOUNT ROUTES
+  app.get('/getAccountInfo', IAccountInfoSchema, async (req: any, reply: any) => {
+    console.log(' ===> Request Received')
+
+    const userData = parseHeaderToUserData(req.headers)
+    if (!userData) {
+      return reply.code(401).send({ message: 'Invalid Token Provided' })
+    }
+
+    console.log(' ===> User Data Parsed', userData)
+
+    const user = await app.prisma.users.findUnique({
+      where: {
+        id: userData.id
+      }
+    })
+
+    if (!user) {
+      return reply.code(404).send({ message: 'User Not Found' })
+    }
+
+    console.log(' ===> User Found and Sent', user)
+    return reply.code(200).send({ message: 'User Found', user: user })
+
+  })
 
   app.post('/update-profile-pictures', IProfilePictureSchema, async function (req, reply) {
     try {
@@ -83,7 +107,6 @@ export async function AppRoutes(app: FastifyInstance) {
     return reply.code(200).send({ message: 'Password Changed' })
   })
 
-  // 8 - Delete Account Route
   app.delete('/delete', async (request: any, reply: any) => {
     try {
       await app.prisma.users.delete({

@@ -7,7 +7,8 @@
     "generate": "npx prisma generate",
     "build": "npx tsc",
     "start": "node dist/src/Server.js",
-    "dev": "nodemon src/Server.ts --inspect=8081",
+    "bun": "bun nodemon src/Server.ts --inspect=8081",
+    "dev": "npx nodemon src/Server.ts --inspect=8081",
     "deploy": "npm version patch && git push && git push --tags"
   },
   "repository": {
@@ -15,11 +16,19 @@
     "url": "git+https://github.com/sorbrex/MoneyKeeper-API.git"
   },
   "keywords": [
+    "moneykeeper",
+    "money",
+    "keeper",
+    "backend",
+    "typescript",
     "prisma",
     "mongodb",
     "fastify",
-    "moneykeeper",
-    "api"
+    "api",
+    "rest",
+    "restful",
+    "rest-api",
+    "restful-api"
   ],
   "author": "Sorbrex",
   "license": "MIT",
