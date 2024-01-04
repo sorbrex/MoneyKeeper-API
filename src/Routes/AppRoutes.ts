@@ -19,7 +19,7 @@ export async function AppRoutes(app: FastifyInstance) {
       let decoded = JWT.verify(authToken, process.env.JWT_SECRET_KEY || '')
 
       if (!decoded) {
-        console.log('\x1B[31mToken Invalid or Expired\x1B[0m')
+        console.log('\x1B[31mToken Invalid or Expired \x1B[0m')
         return reply.code(401).send({ message: 'Invalid Token Provided' })
       }
 
@@ -62,7 +62,7 @@ export async function AppRoutes(app: FastifyInstance) {
 
   })
 
-  app.post('/update-profile-pictures', IProfilePictureSchema, async function (req, reply) {
+  app.post('/update-profile-picture', IProfilePictureSchema, async function (req, reply) {
     try {
       const userData = parseHeaderToUserData(req.headers)
 
@@ -70,8 +70,17 @@ export async function AppRoutes(app: FastifyInstance) {
         return reply.code(401).send({ message: 'Invalid Token Provided' })
       }
 
-      const profilePicture = (req.body as { profilePicture: string }).profilePicture
-      const imageUrl = await GCStorage.uploadFile(profilePicture, `shared/${userData.id}/profile/${Date.now()}_profile_pic.png`)
+      const profilePicture = (req.body as { profilePicture: Buffer }).profilePicture
+      const imageUrl = await GCStorage.uploadFile(profilePicture, `shared/${userData.id}/profile/profile_picture.png`)
+
+      await app.prisma.users.update({
+        where: {
+          id: userData.id
+        },
+        data: {
+          remoteImageUrl: imageUrl
+        }
+      })
 
       return reply.code(200).send({ message: 'Profile Picture Updated', url: imageUrl })
 

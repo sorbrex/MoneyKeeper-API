@@ -14,14 +14,14 @@ export default class GCStorage {
 			scopes: process.env.SCOPES || "",
 			credentials: {
 				client_email: process.env.CLIENT_EMAIL || "",
-				private_key: process.env.PRIVATE_KEY || ""
+				private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join('\n') || ""
 			}
 		});
 
 		this.bucket = this.storage.bucket(process.env.BUCKET_NAME || "");
 	}
 
-	static async uploadFile(fileBuffer: any, destination: string) {
+	static async uploadFile(fileBuffer: Buffer, destination: string) {
 		const file = this.bucket.file(destination); //destination is the name of the file in the bucket with sub folders
 		return await file.save(fileBuffer, {
 			metadata: {
@@ -32,10 +32,7 @@ export default class GCStorage {
 		}).then(() => {
 			console.log(`File ${file.name} uploaded.`);
 			return `https://storage.googleapis.com/${this.bucket.name}/${file.name}`;
-		}).catch((err: any) => {
-			console.log(err);
-			return "";
-		});
+		})
 	}
 
 }
