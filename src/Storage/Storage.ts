@@ -21,6 +21,13 @@ export default class GCStorage {
 		this.bucket = this.storage.bucket(process.env.BUCKET_NAME || "");
 	}
 
+	static async cleanDirectory(directory: string) {
+		const [files] = await this.bucket.getFiles({ prefix: directory });
+		for (const file of files) {
+			await file.delete();
+		}
+	}
+
 	static async uploadFile(fileBuffer: Buffer, destination: string) {
 		const file = this.bucket.file(destination); //destination is the name of the file in the bucket with sub folders
 		return await file.save(fileBuffer, {

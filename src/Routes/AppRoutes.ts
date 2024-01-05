@@ -4,6 +4,7 @@ import {IAccountInfoSchema, IJWTVerifySchema, IProfilePictureSchema} from "../In
 import GCStorage from "../Storage/Storage";
 import { parseHeaderToUserData } from "../Utils/Utils";
 import {User} from "../Types/Types";
+import path from "path";
 
 
 export async function AppRoutes(app: FastifyInstance) {
@@ -71,7 +72,11 @@ export async function AppRoutes(app: FastifyInstance) {
       }
 
       const profilePicture = (req.body as { profilePicture: Buffer }).profilePicture
-      const imageUrl = await GCStorage.uploadFile(profilePicture, `shared/${userData.id}/profile/profile_picture.png`)
+
+      const remotePath = `shared/${userData.id}/profile/picture`
+
+      await GCStorage.cleanDirectory(path.join(remotePath, '/'))
+      const imageUrl = await GCStorage.uploadFile(profilePicture, `${path.join(remotePath,`${Date.now()}_profile_picture.png`)}`)
 
       await app.prisma.users.update({
         where: {
