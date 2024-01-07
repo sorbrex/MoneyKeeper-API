@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify"
+import {FastifyInstance} from "fastify"
 import JWT from "jsonwebtoken";
 import {IAccountInfoSchema, IJWTVerifySchema, IProfilePictureSchema} from "../Interfaces/Interfaces";
 import GCStorage from "../Storage/Storage";
@@ -32,7 +32,7 @@ export async function AppRoutes(app: FastifyInstance) {
 
 
   app.get('/ping', async (_: any, reply: any) => {
-    return reply.code(200).send({ message: 'pong' })
+    return reply.code(200).send({ message: 'App Pong' })
   })
 
   // BASIC ROUTES
@@ -63,7 +63,7 @@ export async function AppRoutes(app: FastifyInstance) {
 
   })
 
-  app.post('/update-profile-picture', IProfilePictureSchema, async function (req, reply) {
+  app.post('/updateProfilePicture', IProfilePictureSchema, async function (req, reply) {
     try {
       const userData = parseHeaderToUserData(req.headers)
 
@@ -95,7 +95,7 @@ export async function AppRoutes(app: FastifyInstance) {
     }
   })
 
-  app.post('/change-password', async (req: any, reply: any) => {
+  app.post('/changePassword', async (req: any, reply: any) => {
     const userData = parseHeaderToUserData(req.headers)
     if (!userData) {
       return reply.code(401).send({ message: 'Invalid Token Provided' })
