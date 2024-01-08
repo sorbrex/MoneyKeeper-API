@@ -115,12 +115,16 @@ export async function AppRoutes(app: FastifyInstance) {
     return reply.code(200).send({ message: 'Password Changed' })
   })
 
-  app.delete('/delete', async (request: any, reply: any) => {
+  app.delete('/user', async (request: any, reply: any) => {
+    const userData = parseHeaderToUserData(request.headers)
+    if (!userData) {
+      return reply.code(401).send({ message: 'Invalid Token Provided' })
+    }
+
     try {
       await app.prisma.users.delete({
         where: {
-          id: request.body.id,
-          email: request.body.email
+          id: userData.id
         }
       })
       return reply.code(200).send({ message: 'Account Deleted' })
