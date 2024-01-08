@@ -1,9 +1,9 @@
-import {IConfirmSchema, ISignUpSchema, ILoginSchema, IResetSchema} from "../Interfaces/Interfaces"
+import { IConfirmSchema, ISignUpSchema, ILoginSchema, IResetSchema } from "../Interfaces/Interfaces"
 import getTemplate from "../Utils/MailTemplates"
 import { FastifyInstance } from "fastify"
 import JWT from 'jsonwebtoken'
 import crypto from 'crypto'
-import {generatePassword} from "../Utils/Utils";
+import { generatePassword } from "../Utils/Utils";
 
 export async function UserRoutes(app: FastifyInstance) {
   //Ping Route For Testing
@@ -14,12 +14,11 @@ export async function UserRoutes(app: FastifyInstance) {
   // 1 - Signup Route
   app.post('/signup', ISignUpSchema, async (request: any, reply: any) => {
     const userData = request.body
-    const DB = app.prisma
 
     try {
 
       //Check If User With Same Email Exists
-      const result = await DB.users.findUnique({
+      const result = await app.prisma.users.findUnique({
         where: {
           email: userData.email
         }
@@ -31,7 +30,7 @@ export async function UserRoutes(app: FastifyInstance) {
       }
 
       //User Doesn't Exist, Create New User
-      let userCreated = await DB.users.create({
+      let userCreated = await app.prisma.users.create({
         data: {
           name: userData.name,
           surname: userData.surname,
@@ -41,13 +40,13 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //User Created, Generate JWT Token for Confirmation Email
-      let token = JWT.sign(userData, process.env.JWT_SECRET_KEY || '',{ expiresIn: '48h' })
+      let token = JWT.sign(userData, process.env.JWT_SECRET_KEY || '', { expiresIn: '48h' })
       let tokenHash = crypto.createHash('sha256').update(token).digest('hex')
-      await DB.jWT.create({
+      await app.prisma.verificationTokens.create({
         data: {
           token: token,
           hashed: tokenHash,
-          userId: userCreated.id,
+          userId: userCreated.id
         }
       })
 
@@ -87,7 +86,6 @@ export async function UserRoutes(app: FastifyInstance) {
   // 2 - Confirm Route (When The User Click On The Email Link)
   app.get('/confirm', IConfirmSchema, async (request: any, reply: any) => {
     try {
-      const DB = app.prisma
       const hashedToken = request.query.jwt
 
       if (!hashedToken) {
@@ -97,7 +95,7 @@ export async function UserRoutes(app: FastifyInstance) {
       }
 
       //Check If Token Exists
-      const result = await DB.jWT.findUnique({
+      const result = await app.prisma.verificationTokens.findUnique({
         where: {
           hashed: hashedToken
         }
@@ -115,7 +113,7 @@ export async function UserRoutes(app: FastifyInstance) {
 
       if (!decoded) {
         //Token Is Invalid, Delete Token
-        await DB.jWT.delete({
+        await app.prisma.verificationTokens.delete({
           where: {
             hashed: hashedToken
           }
@@ -128,7 +126,7 @@ export async function UserRoutes(app: FastifyInstance) {
       }
 
       //Token Is Valid, Update User
-      await DB.users.update({
+      await app.prisma.users.update({
         where: {
           id: result.userId
         },
@@ -138,7 +136,7 @@ export async function UserRoutes(app: FastifyInstance) {
       })
 
       //User Updated, Delete Token
-      await DB.jWT.delete({
+      await app.prisma.verificationTokens.delete({
         where: {
           hashed: hashedToken
         }
@@ -198,7 +196,7 @@ export async function UserRoutes(app: FastifyInstance) {
 
   // 5 - Reset Password Route
   app.post('/reset', IResetSchema, async (request: any, reply: any) => {
-    try{
+    try {
 
       //Check If User Exists
       const dbUser = await app.prisma.users.findUnique({
