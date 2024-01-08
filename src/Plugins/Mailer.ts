@@ -1,5 +1,6 @@
 import fp from 'fastify-plugin'
 import nodemailer, { Transporter } from 'nodemailer'
+import {FastifyInstance} from "fastify";
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -7,7 +8,7 @@ declare module 'fastify' {
   }
 }
 
-const Mailer = fp(async (fastifyInstance) => {
+const Mailer = fp(async (fastifyInstance: FastifyInstance) => {
   const smtpConfigurtation = {
     host: process.env.NODEMAILER_HOST,
     port: parseInt(process.env.NODEMAILER_PORT || '587'),

@@ -23,7 +23,7 @@ model Users {
   remoteImageUrl String?
   active         Boolean        @default(false)
   completed      Boolean        @default(false)
-  JWT            JWT?
+  JWT            JWT[]
   Transaction    Transactions[]
 }
 
@@ -32,7 +32,7 @@ model JWT {
   token  String @unique
   hashed String @unique
   owner  Users  @relation(fields: [userId], references: [id])
-  userId String @unique @db.ObjectId
+  userId String @db.ObjectId
 }
 
 model Transactions {

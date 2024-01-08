@@ -37,7 +37,6 @@ export default class GCStorage {
 			public: true,
 			validation: "md5",
 		}).then(() => {
-			console.log(`File ${file.name} uploaded.`);
 			return `https://storage.googleapis.com/${this.bucket.name}/${file.name}`;
 		})
 	}

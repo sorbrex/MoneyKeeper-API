@@ -24,7 +24,7 @@ export async function ContactRoutes(app: FastifyInstance) {
       console.log('Message sent successfully')
       return reply.code(200).send({ message: 'Message Sent' })
     } catch (error) {
-      console.log('[Contact Email] Internal Server Error', error)
+      console.error('[Contact Email] Internal Server Error', error)
       return reply.code(500).send({ message: '[Contact Email] Internal Server Error', error: error })
     }
   })

@@ -77,7 +77,7 @@ export async function UserRoutes(app: FastifyInstance) {
       return reply.code(200).send({ message: 'User Created. Email Sent.' })
 
     } catch (err) {
-      console.log("[User Creation Error] => ", err)
+      console.error("[User Creation Error] => ", err)
       reply.sendFile("Error.html")
       reply.code(500)
       return reply
@@ -148,7 +148,7 @@ export async function UserRoutes(app: FastifyInstance) {
       reply.status(200)
       return reply
     } catch (err) {
-      console.log(err)
+      console.error(err)
       reply.sendFile("Error.html")
       reply.code(500)
       return reply
@@ -250,7 +250,7 @@ export async function UserRoutes(app: FastifyInstance) {
       return reply.code(200).send({ message: 'Password Reset. Email Sent With New Password.' })
 
     } catch (err) {
-      console.log("[Password Reset Error] => ", err)
+      console.error("[Password Reset Error] => ", err)
       reply.sendFile("Error.html")
       reply.code(500)
       return reply

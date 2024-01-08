@@ -20,12 +20,12 @@ export async function AppRoutes(app: FastifyInstance) {
       let decoded = JWT.verify(authToken, process.env.JWT_SECRET_KEY || '')
 
       if (!decoded) {
-        console.log('\x1B[31mToken Invalid or Expired \x1B[0m')
+        console.error('\x1B[31mToken Invalid or Expired \x1B[0m')
         return reply.code(401).send({ message: 'Invalid Token Provided' })
       }
 
     } catch (err) {
-      console.log(`\x1B[31mToken Invalid or Expired ${err}\x1B[0m`)
+      console.error(`\x1B[31mToken Invalid or Expired ${err}\x1B[0m`)
       return reply.code(401).send({ message: 'Token Invalid', error: err })
     }
   })
@@ -90,7 +90,7 @@ export async function AppRoutes(app: FastifyInstance) {
       return reply.code(200).send({ message: 'Profile Picture Updated', url: imageUrl })
 
     } catch (err) {
-      console.log(err)
+      console.error(err)
       return reply.code(500).send({ message: 'Internal Server Error' })
     }
   })
@@ -115,7 +115,7 @@ export async function AppRoutes(app: FastifyInstance) {
     return reply.code(200).send({ message: 'Password Changed' })
   })
 
-  app.delete('/user', async (request: any, reply: any) => {
+  app.delete('/deleteUser', async (request: any, reply: any) => {
     const userData = parseHeaderToUserData(request.headers)
     if (!userData) {
       return reply.code(401).send({ message: 'Invalid Token Provided' })
@@ -129,6 +129,7 @@ export async function AppRoutes(app: FastifyInstance) {
       })
       return reply.code(200).send({ message: 'Account Deleted' })
     } catch (err) {
+      console.error(err)
       return reply.code(500).send({ message: 'Internal Server Error', error: err })
     }
   })

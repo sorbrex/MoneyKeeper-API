@@ -1,14 +1,13 @@
-import JWT, { JwtPayload } from "jsonwebtoken"
-import { JWTData } from "src/Types/Types"
+import JWT, {JwtPayload} from "jsonwebtoken"
+import {JWTData} from "src/Types/Types"
 
 export function parseHeaderToUserData(headers: any): JWTData | null {
 	try {
 		const authToken = headers.authorization.split(' ')[1]
 		const decoded = JWT.verify(authToken, process.env.JWT_SECRET_KEY || '') as JwtPayload
-		const userData = decoded['data'] as JWTData || null
-		return userData
+		return decoded['data'] as JWTData || null
 	} catch (err) {
-		console.log(`\x1B[31mToken Invalid or Expired ${err}\x1B[0m`)
+		console.error(`\x1B[31mToken Invalid or Expired ${err}\x1B[0m`)
 		return null
 	}
 }
