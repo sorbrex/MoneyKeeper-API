@@ -7,6 +7,7 @@ export type JWTData = {
 
 export type User = {
   id: string,
+  role: string,
   name: string,
   surname: string,
   email: string,

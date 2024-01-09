@@ -30,19 +30,21 @@ export async function AppRoutes(app: FastifyInstance) {
     }
   })
 
-
   app.get('/ping', async (_: any, reply: any) => {
     return reply.code(200).send({ message: 'App Pong' })
   })
 
-  // BASIC ROUTES
+  //==========================//
+  //========== JWT ===========//
+  //==========================//
   app.get('/verifyJwt', IJWTVerifySchema, async (_: any, reply: any) => {
     //We have a Hook that verify the JWT on every request, so if we reach this route the JWT is valid
     return reply.code(200).send({ message: 'Token Valid' })
   })
 
-
-  // ACCOUNT ROUTES
+  //==========================//
+  //========= ACCOUNT=========//
+  //==========================//
   app.get('/getAccountInfo', IAccountInfoSchema, async (req: any, reply: any) => {
     const userData = parseHeaderToUserData(req.headers)
     if (!userData) {
@@ -128,6 +130,65 @@ export async function AppRoutes(app: FastifyInstance) {
         }
       })
       return reply.code(200).send({ message: 'Account Deleted' })
+    } catch (err) {
+      console.error(err)
+      return reply.code(500).send({ message: 'Internal Server Error', error: err })
+    }
+  })
+
+  //==========================//
+  //====== TRANSACTION =======//
+  //==========================//
+  // Create Transaction
+  // Delete Transaction
+  // Get Transaction
+
+  //==========================//
+  //======= CATEGORY =========//
+  //==========================//
+  // House/Car/Food/Hobby/Health
+  app.get('/getCategories', async (_: any, reply: any) => {
+    try {
+      const categories = await app.prisma.category.findMany()
+      return reply.code(200).send(categories)
+    } catch (err) {
+      console.error(err)
+      return reply.code(500).send({ message: 'Internal Server Error', error: err })
+    }
+  })
+
+  // Create Category - Admin Only
+  app.post('/createCategory', async (request: any, reply: any) => {
+    const userData = parseHeaderToUserData(request.headers)
+    if (!userData) {
+      return reply.code(401).send({ message: 'Invalid Token Provided' })
+    }
+
+    const user = await app.prisma.users.findUnique({
+      where: {
+        id: userData.id
+      }
+    })
+
+    if (!user) {
+      return reply.code(404).send({ message: 'User Not Found' })
+    }
+
+    if (user.role !== 'ADMIN') {
+      return reply.code(401).send({ message: 'User Not Admin' })
+    }
+
+    const { name, description, remoteURL } = request.body
+
+    try {
+      await app.prisma.category.create({
+        data: {
+          name: name,
+          description: description,
+          remoteIconURL: remoteURL
+        }
+      })
+      return reply.code(200).send({ message: 'Category Created' })
     } catch (err) {
       console.error(err)
       return reply.code(500).send({ message: 'Internal Server Error', error: err })

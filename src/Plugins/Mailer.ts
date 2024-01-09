@@ -9,7 +9,7 @@ declare module 'fastify' {
 }
 
 const Mailer = fp(async (fastifyInstance: FastifyInstance) => {
-  const smtpConfigurtation = {
+  const configuration = {
     host: process.env.NODEMAILER_HOST,
     port: parseInt(process.env.NODEMAILER_PORT || '587'),
     secure: false,
@@ -18,7 +18,7 @@ const Mailer = fp(async (fastifyInstance: FastifyInstance) => {
       pass: process.env.NODEMAILER_PASSWORD,
     }
   }
-  const transporter = nodemailer.createTransport(smtpConfigurtation)
+  const transporter = nodemailer.createTransport(configuration)
   fastifyInstance.decorate('transporter', transporter)
 })
 
