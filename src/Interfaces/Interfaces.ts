@@ -194,6 +194,13 @@ export const IProfilePictureSchema = {
 
 export const IAccountInfoSchema = {
   schema: {
+    headers: {
+      type: 'object',
+      properties: {
+        'Authorization': { type: 'string' }
+      },
+      required: ['Authorization']
+    },
     response: {
       200: {
         type: 'object',
@@ -205,6 +212,91 @@ export const IAccountInfoSchema = {
           password: { type: 'string' },
           remoteImageUrl: { type: 'string' }
         }
+      },
+      '4xx': {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      500: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          error: { type: 'string' }
+        }
+      }
+    }
+  }
+}
+
+export const ICreateCategorySchema = {
+  schema: {
+    headers: {
+      type: 'object',
+      properties: {
+        'Authorization': { type: 'string' }
+      },
+      required: ['Authorization']
+    },
+    body: {
+      type: 'object',
+      required: ['name', "description"],
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+      },
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+        },
+      },
+      '4xx': {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      500: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          error: { type: 'string' }
+        }
+      }
+    }
+  }
+}
+
+export const ICreateTransactionSchema = {
+  schema: {
+    headers: {
+      type: 'object',
+      properties: {
+        'Authorization': { type: 'string' }
+      },
+      required: ['Authorization']
+    },
+    body: {
+      type: 'object',
+      required: ['name', "description", "amount", "categoryId", "type"],
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+        amount: { type: 'number' },
+        categoryId: { type: 'string' },
+        type: { type: 'string' },
+      },
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+        },
       },
       '4xx': {
         type: 'object',

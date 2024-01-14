@@ -1,9 +1,14 @@
 import { FastifyInstance } from "fastify"
 import JWT from "jsonwebtoken";
-import { IAccountInfoSchema, IJWTVerifySchema, IProfilePictureSchema } from "../Interfaces/Interfaces";
+import {
+  IAccountInfoSchema,
+  ICreateCategorySchema, ICreateTransactionSchema,
+  IJWTVerifySchema,
+  IProfilePictureSchema
+} from "../Interfaces/Interfaces";
 import GCStorage from "../Storage/Storage";
 import { parseHeaderToUserData } from "../Utils/Utils";
-import { User } from "../Types/Types";
+import {Transaction, User} from "../Types/Types";
 import path from "path";
 
 
@@ -140,8 +145,61 @@ export async function AppRoutes(app: FastifyInstance) {
   //====== TRANSACTION =======//
   //==========================//
   // Create Transaction
+  app.post('/createTransaction', ICreateTransactionSchema, async (request: any, reply: any) => {
+    try {
+      const userData = parseHeaderToUserData(request.headers)
+      if (!userData) {
+        return reply.code(401).send({message: 'Invalid Token Provided'})
+      }
+
+      const user = await app.prisma.users.findUnique({
+        where: {
+          id: userData.id
+        }
+      })
+
+      const {name, description, amount, categoryId, type} = request.body
+      const createdAt = new Date()
+      const userId = user?.id as string
+
+      await app.prisma.transactions.create({
+        data: {
+          name,
+          description,
+          amount,
+          type,
+          categoryId,
+          createdAt,
+          userId
+        }
+      })
+
+      return reply.code(200).send({message: 'Transaction Created'})
+    } catch (error){
+      console.error(error)
+      return reply.code(500).send({message: 'Internal Server Error', error})
+    }
+  })
+
   // Delete Transaction
   // Get Transaction
+  app.get('/getTransactions', async (request: any, reply: any) => {
+    const userData = parseHeaderToUserData(request.headers)
+    if (!userData) {
+      return reply.code(401).send({ message: 'Invalid Token Provided' })
+    }
+    try {
+      const transaction = await app.prisma.transactions.findMany({
+        where: {
+          userId: userData.id
+        }
+      })
+      return reply.code(200).send(transaction)
+    } catch (err) {
+      console.error(err)
+      return reply.code(500).send({ message: 'Internal Server Error', error: err })
+    }
+  })
 
   //==========================//
   //======= CATEGORY =========//
@@ -158,7 +216,7 @@ export async function AppRoutes(app: FastifyInstance) {
   })
 
   // Create Category - Admin Only
-  app.post('/createCategory', async (request: any, reply: any) => {
+  app.post('/createCategory', ICreateCategorySchema, async (request: any, reply: any) => {
     const userData = parseHeaderToUserData(request.headers)
     if (!userData) {
       return reply.code(401).send({ message: 'Invalid Token Provided' })
@@ -178,14 +236,13 @@ export async function AppRoutes(app: FastifyInstance) {
       return reply.code(401).send({ message: 'User Not Admin' })
     }
 
-    const { name, description, remoteURL } = request.body
+    const { name, description } = request.body
 
     try {
       await app.prisma.category.create({
         data: {
           name: name,
-          description: description,
-          remoteIconURL: remoteURL
+          description: description
         }
       })
       return reply.code(200).send({ message: 'Category Created' })

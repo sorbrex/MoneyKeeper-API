@@ -37,24 +37,24 @@ model VerificationTokens {
 }
 
 model Transactions {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  amount Float
-  name   String
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  createdAt   DateTime
+  amount      Float
+  description String?
+  type        String
 
-  createdAt DateTime
+  owner       Users  @relation(fields: [userId], references: [id])
+  userId      String @db.ObjectId
 
-  owner  Users  @relation(fields: [userId], references: [id])
-  userId String @db.ObjectId
-
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId String   @db.ObjectId
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String   @db.ObjectId
 }
 
 model Category {
   id            String  @id @default(auto()) @map("_id") @db.ObjectId
   name          String
-  description   String?
-  remoteIconURL String?
+  description   String
 
   Transactions Transactions[]
 }

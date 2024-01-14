@@ -14,3 +14,14 @@ export type User = {
   password: string,
   remoteImageUrl: string
 }
+
+export type Transaction = {
+  id: string
+  name: string
+  description?: string
+  amount: number
+  userId: string
+  categoryId: string
+  type: "expense" | "income"
+  createdAt: Date
+}
