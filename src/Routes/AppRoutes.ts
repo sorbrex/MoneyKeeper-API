@@ -3,7 +3,7 @@ import JWT from "jsonwebtoken";
 import {
   IAccountInfoSchema,
   ICreateCategorySchema, ICreateTransactionSchema, IDeleteTransactionSchema,
-  IJWTVerifySchema,
+  IJWTVerifySchema, IPatchTransactionSchema,
   IProfilePictureSchema
 } from "../Interfaces/Interfaces";
 import GCStorage from "../Storage/Storage";
@@ -175,6 +175,45 @@ export async function AppRoutes(app: FastifyInstance) {
       })
 
       return reply.code(200).send({message: 'Transaction Created'})
+    } catch (error){
+      console.error(error)
+      return reply.code(500).send({message: 'Internal Server Error', error})
+    }
+  })
+
+  app.patch('/updateTransaction', IPatchTransactionSchema, async (request: any, reply: any) => {
+    try {
+      const userData = parseHeaderToUserData(request.headers)
+      if (!userData) {
+        return reply.code(401).send({message: 'Invalid Token Provided'})
+      }
+
+      const user = await app.prisma.users.findUnique({
+        where: {
+          id: userData.id
+        }
+      })
+
+      const {name, description, amount, categoryId, type} = request.body
+      const userId = user?.id as string
+
+      await app.prisma.transactions.update(
+        {
+          where: {
+            id: request.body.id,
+            userId: userId
+          },
+          data: {
+            name,
+            description,
+            amount,
+            categoryId,
+            type
+          }
+        }
+      )
+
+      return reply.code(200).send({message: 'Transaction Updated'})
     } catch (error){
       console.error(error)
       return reply.code(500).send({message: 'Internal Server Error', error})
