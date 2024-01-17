@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify"
 import JWT from "jsonwebtoken";
 import {
   IAccountInfoSchema,
-  ICreateCategorySchema, ICreateTransactionSchema,
+  ICreateCategorySchema, ICreateTransactionSchema, IDeleteTransactionSchema,
   IJWTVerifySchema,
   IProfilePictureSchema
 } from "../Interfaces/Interfaces";
@@ -182,6 +182,35 @@ export async function AppRoutes(app: FastifyInstance) {
   })
 
   // Delete Transaction
+  app.delete('/deleteTransaction', IDeleteTransactionSchema, async (request: any, reply: any) => {
+    const userData = parseHeaderToUserData(request.headers)
+    if (!userData) {
+      return reply.code(401).send({ message: 'Invalid Token Provided' })
+    }
+
+    try {
+
+      const user = await app.prisma.users.findUnique({
+        where: {
+          id: userData.id
+        }
+      })
+
+      const transactionId = request.body.transactionId as string
+
+      await app.prisma.transactions.delete({
+        where: {
+          id: transactionId,
+          userId: user?.id as string
+        }
+      })
+      return reply.code(200).send({ message: 'Transaction Deleted' })
+    } catch (err) {
+      console.error(err)
+      return reply.code(500).send({ message: 'Internal Server Error', error: err })
+    }
+  })
+
   // Get Transaction
   app.get('/getTransactions', async (request: any, reply: any) => {
     const userData = parseHeaderToUserData(request.headers)

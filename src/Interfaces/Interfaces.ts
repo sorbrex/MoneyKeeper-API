@@ -314,3 +314,43 @@ export const ICreateTransactionSchema = {
     }
   }
 }
+
+export const IDeleteTransactionSchema = {
+  schema: {
+    headers: {
+      type: 'object',
+      properties: {
+        'Authorization': { type: 'string' }
+      },
+      required: ['Authorization']
+    },
+    body: {
+      type: 'object',
+      required: ["transactionId"],
+      properties: {
+        transactionId: { type: 'string' }
+      },
+    },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+        },
+      },
+      '4xx': {
+        type: 'object',
+        properties: {
+          message: { type: 'string' }
+        }
+      },
+      500: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          error: { type: 'string' }
+        }
+      }
+    }
+  }
+}
