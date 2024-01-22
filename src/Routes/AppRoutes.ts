@@ -256,11 +256,19 @@ export async function AppRoutes(app: FastifyInstance) {
     if (!userData) {
       return reply.code(401).send({ message: 'Invalid Token Provided' })
     }
+
+    //Check if limit is provided
+    const limit = request.query.limit as string
+    if (limit && isNaN(Number(limit))) {
+      return reply.code(400).send({ message: 'Limit must be a number' })
+    }
+
     try {
       const transaction = await app.prisma.transactions.findMany({
         where: {
           userId: userData.id
-        }
+        },
+        take: Number(limit) || undefined,
       })
       return reply.code(200).send(transaction)
     } catch (err) {
