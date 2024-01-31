@@ -269,6 +269,9 @@ export async function AppRoutes(app: FastifyInstance) {
           userId: userData.id
         },
         take: Number(limit) || undefined,
+        orderBy: {
+          createdAt: 'desc'
+        }
       })
       return reply.code(200).send(transaction)
     } catch (err) {
