@@ -102,7 +102,7 @@ export async function AppRoutes(app: FastifyInstance) {
     }
   })
 
-  app.post('/changePassword', async (req: any, reply: any) => {
+  app.patch('/changePassword', async (req: any, reply: any) => {
     const userData = parseHeaderToUserData(req.headers)
     if (!userData) {
       return reply.code(401).send({ message: 'Invalid Token Provided' })
@@ -220,7 +220,6 @@ export async function AppRoutes(app: FastifyInstance) {
     }
   })
 
-  // Delete Transaction
   app.delete('/deleteTransaction', IDeleteTransactionSchema, async (request: any, reply: any) => {
     const userData = parseHeaderToUserData(request.headers)
     if (!userData) {
@@ -250,7 +249,6 @@ export async function AppRoutes(app: FastifyInstance) {
     }
   })
 
-  // Get Transaction
   app.get('/getTransactions', async (request: any, reply: any) => {
     const userData = parseHeaderToUserData(request.headers)
     if (!userData) {
