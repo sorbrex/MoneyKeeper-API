@@ -194,13 +194,13 @@ export async function AppRoutes(app: FastifyInstance) {
         }
       })
 
-      const {name, description, amount, categoryId, type} = request.body
+      const {id, name, description, amount, categoryId, type} = request.body
       const userId = user?.id as string
 
       await app.prisma.transactions.update(
         {
           where: {
-            id: request.body.id,
+            id: id,
             userId: userId
           },
           data: {
