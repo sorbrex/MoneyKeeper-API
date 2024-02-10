@@ -70,7 +70,7 @@ export async function AppRoutes(app: FastifyInstance) {
 
   })
 
-  app.post('/updateProfilePicture', IProfilePictureSchema, async function (req, reply) {
+  app.post('/updateProfilePicture', async function (req, reply) {
     try {
       const userData = parseHeaderToUserData(req.headers)
 
@@ -78,8 +78,7 @@ export async function AppRoutes(app: FastifyInstance) {
         return reply.code(401).send({ message: 'Invalid Token Provided' })
       }
 
-      const profilePicture = (req.body as { profilePicture: Buffer }).profilePicture
-
+      const profilePicture = (req.body as { file: Buffer }).file
       const remotePath = `shared/${userData.id}/profile/picture`
 
       await GCStorage.cleanDirectory(path.join(remotePath, '/'))
@@ -95,7 +94,6 @@ export async function AppRoutes(app: FastifyInstance) {
       })
 
       return reply.code(200).send({ message: 'Profile Picture Updated', url: imageUrl })
-
     } catch (err) {
       console.error(err)
       return reply.code(500).send({ message: 'Internal Server Error' })
