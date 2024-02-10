@@ -127,6 +127,12 @@ export async function AppRoutes(app: FastifyInstance) {
     }
 
     try {
+      await app.prisma.transactions.deleteMany({
+        where: {
+          userId: userData.id
+        }
+      })
+
       await app.prisma.users.delete({
         where: {
           id: userData.id

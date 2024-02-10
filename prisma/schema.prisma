@@ -44,7 +44,7 @@ model Transactions {
   description String?
   type        String
 
-  owner       Users  @relation(fields: [userId], references: [id])
+  user        Users  @relation(fields: [userId], references: [id])
   userId      String @db.ObjectId
 
   category    Category @relation(fields: [categoryId], references: [id])
